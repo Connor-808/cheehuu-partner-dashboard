@@ -795,14 +795,25 @@
         });
 
         // Confirm send button
-        document.getElementById('confirm-send').addEventListener('click', async () => {
+        const confirmSendBtn = document.getElementById('confirm-send');
+        let isSending = false; // Prevent duplicate sends
+
+        confirmSendBtn.addEventListener('click', async () => {
+          // Prevent duplicate clicks
+          if (isSending) return;
+          isSending = true;
+
           const title = document.getElementById('title').value;
           const body = document.getElementById('body').value;
 
-          // Hide modal
-          confirmationModal.classList.remove('show');
+          // Disable confirm button immediately
+          confirmSendBtn.disabled = true;
+          confirmSendBtn.textContent = 'Sending...';
 
-          // Disable button and show loading state
+          // Hide modal after a brief delay to show the "Sending..." state
+          setTimeout(() => confirmationModal.classList.remove('show'), 300);
+
+          // Disable main button and show loading state
           sendBtn.disabled = true;
           sendBtn.textContent = 'Sending...';
           notificationMessage.innerHTML = '';
@@ -828,8 +839,12 @@
           } catch (error) {
             notificationMessage.innerHTML = `<div class="error-message">✗ ${error.message}</div>`;
           } finally {
+            // Re-enable buttons
             sendBtn.disabled = false;
             sendBtn.textContent = 'Send to All Users';
+            confirmSendBtn.disabled = false;
+            confirmSendBtn.textContent = 'Send to All Users';
+            isSending = false;
           }
         });
 
